@@ -1,18 +1,30 @@
 import os
+
 from logging import config as logging_config
+
+from pydantic import BaseSettings, Field, StrictStr, StrictInt
 
 from core.logger import LOGGING
 
-logging_config.dictConfig(LOGGING)
 
-PROJECT_NAME = os.getenv('PROJECT_NAME', 'movies')
+class SettingsAPI(BaseSettings):
+    """api settings format validation."""
 
-REDIS_HOST = os.getenv('REDIS_HOST', 'redis')
-REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+    PROJECT_NAME: StrictStr = Field('movies', env='PROJECT_NAME')
 
-ELASTIC_HOST = os.getenv('ELASTIC_HOST', 'es')
-ELASTIC_PORT = int(os.getenv('ELASTIC_PORT', 9200))
+    REDIS_HOST: StrictStr = Field('redis', env='REDIS_HOST')
+    REDIS_PORT: StrictInt = Field(6379, env='REDIS_PORT')
+    REDIS_CACHE_EXPIRE_IN_SECONDS: StrictInt = 60 * 5
+
+    ELASTIC_HOST: StrictStr = Field('es', env='ELASTIC_HOST')
+    ELASTIC_PORT: StrictInt = Field(9200, env='ELASTIC_PORT')
+
+    class Config:
+        env_file = '.env'
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-REDIS_CACHE_EXPIRE_IN_SECONDS: int = 60 * 5
+if __name__=='__main__':
+    logging_config.dictConfig(LOGGING)
+    SettingsAPI()

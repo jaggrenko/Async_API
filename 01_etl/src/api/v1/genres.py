@@ -8,11 +8,11 @@ from fastapi_pagination import Page, add_pagination, paginate
 from .messages import GENRE_NOT_FOUND
 from models.genres import Genres
 from models.models_common import ModelValidator
+from .paginator import Paginator
 from services.genres import GenreService, get_genre_service
 
 router = APIRouter()
 
-PagingIdx = Optional[int]
 SearchStr = Optional[str]
 
 
@@ -39,12 +39,13 @@ async def genre_details(genre_id: UUID,
             tags=['FTS'])
 
 async def genres_all(genre_service: GenreService = Depends(get_genre_service),
-                    from_init: PagingIdx = Query(0, title='Пагинация "с"', alias='page[number]'),
-                    to_init: PagingIdx = Query(10, title='Пагинация "количество"', alias='page[size]'),
+                    pagination: Paginator = Depends(),
                     query_init: SearchStr = Query(None, title='Строка поиска', alias='query'),
                     ) -> List[Genres]:
 
-    search_params = {'from': from_init, 'size': to_init, 'query': query_init}
+    search_params = {'from': pagination.from_init,
+                     'size': pagination.to_init,
+                     'query': query_init}
     search_fields_with_weigth = {'name': 5}
 
     genres = await genre_service.get_all(search_params=search_params,

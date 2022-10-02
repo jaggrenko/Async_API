@@ -20,6 +20,8 @@ services:
     expose:
       - "9200"
       - "9300"
+    ports:
+      - "9200:9200"
     env_file:
       - ./prebuild/es/es.env
     environment:
