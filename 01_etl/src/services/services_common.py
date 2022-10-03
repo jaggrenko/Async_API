@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from typing import Dict, List, Optional, AnyStr, Union
+from typing import Dict, List, Optional, AnyStr
 from uuid import UUID
 
 import backoff
@@ -10,7 +10,18 @@ from pydantic import parse_obj_as
 from models.models_common import ModelValidator
 
 
-class CommonService(ABC):
+class AbstractService(ABC):
+
+    @abstractmethod
+    def get_by_id(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def get_all(self, *args, **kwargs):
+        pass
+
+
+class ElasticsearchService(AbstractService):
 
     def __init__(self, es: AsyncElasticsearch):
         self.es = es
@@ -42,7 +53,7 @@ class CommonService(ABC):
                       search_fields: Optional[Dict]) -> List[ModelValidator]:
 
         body = defaultdict(lambda: defaultdict(dict))
-        body.update({'from':search_params.get('from')})
+        body.update({'from': search_params.get('from')})
         body.update({'size': search_params.get('size')})
 
         query = search_params.get('query')

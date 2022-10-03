@@ -1,6 +1,6 @@
 from abc import ABC
 
-from orjson import dumps as orjsn_dumps, loads as orjson_loads
+from orjson import loads as orjson_loads
 from pydantic import BaseModel
 
 
